@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>검색 결과</title>
+    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=eb46d70dcce4c3347f6e67a7afcfa896&libraries=services"></script>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 20px;
+            background-color: #f7f7f7;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        #map {
+            width: 100%;
+            height: 400px;
+            margin-bottom: 30px;
+            border: 2px solid #ccc;
+            border-radius: 10px;
+        }
+        .result-container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #f0f0f0;
+            color: #333;
+        }
+        .franchise {
+            color: red;
+            font-weight: bold;
+        }
+        .non-franchise {
+            color: gray;
+        }
+    </style>
+</head>
+<body>
+    <h1>검색 결과</h1>
+    <div class="result-container">
+        <div id="map"></div>
+        <table>
+            <thead>
+                <tr>
+                    <th>업소명</th>
+                    <th>주소</th>
+                    <th>전화번호</th>
+                    <th>음식종류</th>
+                    <th>프랜차이즈 여부</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for place in results %}
+                <tr>
+                    <td>{{ place.업소명 }}</td>
+                    <td>{{ place.지번 }}</td>
+                    <td>{{ place.전화번호 }}</td>
+                    <td>{{ place.음식종류 }}</td>
+                    <td class="{{ 'franchise' if place.프랜차이즈여부 == '프랜차이즈' else 'non-franchise' }}">
+                        {{ place.프랜차이즈여부 }}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        var mapContainer = document.getElementById('map');
+        var mapOption = {
+            center: new kakao.maps.LatLng(35.967677, 126.736629), // 군산시청
+            level: 4
+        };
+        var map = new kakao.maps.Map(mapContainer, mapOption);
+
+        var places = {{ results|tojson }};
+        places.forEach(function(place) {
+            var marker = new kakao.maps.Marker({
+                map: map,
+                position: new kakao.maps.LatLng(place.위도, place.경도),
+                title: place.업소명
+            });
+        });
+    </script>
+</body>
+</html>
